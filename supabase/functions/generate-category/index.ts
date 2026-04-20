@@ -16,11 +16,16 @@ function sanitizeText(s: unknown, maxLen: number): string {
     .slice(0, maxLen);
 }
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+function buildCorsHeaders(): Record<string, string> {
+  const origin = Deno.env.get("ALLOWED_ORIGIN")?.trim();
+  return {
+    "Access-Control-Allow-Origin":
+      origin && origin.length > 0 ? origin : "*",
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
 
 const DIFFICULTY_HINTS: Record<string, string> = {
   facil: "Palavras MUITO simples, conhecidas por crianças, fáceis de mimicar.",
@@ -39,8 +44,9 @@ async function hashIp(ip: string): Promise<string> {
 }
 
 Deno.serve(async (req) => {
+  const cors = buildCorsHeaders();
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: cors });
   }
 
   try {
@@ -49,7 +55,7 @@ Deno.serve(async (req) => {
     if (!parsed.success) {
       return new Response(
         JSON.stringify({ error: parsed.error.issues[0]?.message ?? "Entrada inválida." }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...cors, "Content-Type": "application/json" } },
       );
     }
     const prompt = parsed.data.prompt.replace(/\s+/g, " ");
@@ -83,7 +89,7 @@ Deno.serve(async (req) => {
           error: "Você já gerou uma categoria nas últimas 24h. Volte amanhã!",
           rateLimited: true,
         }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 429, headers: { ...cors, "Content-Type": "application/json" } },
       );
     }
 
@@ -159,20 +165,20 @@ Regras OBRIGATÓRIAS:
       if (aiResponse.status === 429) {
         return new Response(
           JSON.stringify({ error: "Limite de uso da IA atingido, tente em alguns minutos." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 429, headers: { ...cors, "Content-Type": "application/json" } },
         );
       }
       if (aiResponse.status === 402) {
         return new Response(
           JSON.stringify({ error: "Créditos ou cota do provedor de IA esgotados." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { status: 402, headers: { ...cors, "Content-Type": "application/json" } },
         );
       }
       const txt = await aiResponse.text();
       console.error("AI gateway error:", aiResponse.status, txt);
       return new Response(
         JSON.stringify({ error: "Erro ao gerar categoria." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 500, headers: { ...cors, "Content-Type": "application/json" } },
       );
     }
 
@@ -182,7 +188,7 @@ Regras OBRIGATÓRIAS:
       console.error("Resposta sem tool_call:", JSON.stringify(aiData));
       return new Response(
         JSON.stringify({ error: "IA não retornou categoria válida." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 500, headers: { ...cors, "Content-Type": "application/json" } },
       );
     }
 
@@ -192,7 +198,7 @@ Regras OBRIGATÓRIAS:
     } catch {
       return new Response(
         JSON.stringify({ error: "Resposta da IA mal formatada." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 500, headers: { ...cors, "Content-Type": "application/json" } },
       );
     }
 
@@ -209,7 +215,7 @@ Regras OBRIGATÓRIAS:
     if (cleanWords.length < 10) {
       return new Response(
         JSON.stringify({ error: "IA retornou poucas palavras válidas. Tente outro prompt." }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 500, headers: { ...cors, "Content-Type": "application/json" } },
       );
     }
 
@@ -225,13 +231,16 @@ Regras OBRIGATÓRIAS:
         emoji: sanitizeText(args.emoji, 4) || "✨",
         words: cleanWords,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { headers: { ...cors, "Content-Type": "application/json" } },
     );
   } catch (e) {
     console.error("generate-category error:", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      {
+        status: 500,
+        headers: { ...buildCorsHeaders(), "Content-Type": "application/json" },
+      },
     );
   }
 });
