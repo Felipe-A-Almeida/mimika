@@ -18,6 +18,17 @@ interface Props {
   onCreated: (cat: CategoryDef) => void;
 }
 
+function messageFromInvokeError(error: unknown, fallback: string): string {
+  const body = (error as { context?: { body?: string }; message?: string })?.context?.body;
+  if (typeof body !== "string" || !body) return (error as Error)?.message ?? fallback;
+  try {
+    const parsed = JSON.parse(body) as { error?: string };
+    return typeof parsed.error === "string" ? parsed.error : fallback;
+  } catch {
+    return (error as Error)?.message ?? fallback;
+  }
+}
+
 const difficulties: { id: Difficulty; label: string; activeClass: string }[] = [
   { id: 'facil', label: '😊 Fácil', activeClass: 'bg-game-green text-primary-foreground border-game-green' },
   { id: 'medio', label: '🤔 Médio', activeClass: 'bg-game-orange text-primary-foreground border-game-orange' },
@@ -59,11 +70,8 @@ export default function AiCategoryGenerator({ onCreated }: Props) {
         body: { prompt: parsed.data, difficulty },
       });
       if (error) {
-        const msg = (error as any)?.context?.body
-          ? JSON.parse((error as any).context.body)?.error
-          : error.message;
-        toast.error(msg || 'Erro ao gerar categoria');
-        if ((error as any)?.status === 429) markAiGen();
+        toast.error(messageFromInvokeError(error, 'Erro ao gerar categoria'));
+        if ((error as { status?: number })?.status === 429) markAiGen();
         return;
       }
       if (data?.error) {
