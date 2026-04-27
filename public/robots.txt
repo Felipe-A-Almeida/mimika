@@ -12,3 +12,6 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+
+Sitemap: https://mimika.com.br/sitemap.xml
