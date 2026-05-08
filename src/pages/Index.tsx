@@ -4,12 +4,18 @@ import GameConfig from '@/components/GameConfig';
 import GamePlay from '@/components/GamePlay';
 import VictoryScreen from '@/components/VictoryScreen';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 
 function GameRouter() {
   const { phase } = useGame();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Mimika - Jogo de Mímica Online Grátis para Jogar com Amigos"
+        description="Mimika é o jogo de mímica online grátis para jogar no navegador com amigos e família. Sem download, sem cadastro. Crie categorias com IA e divirta-se!"
+        canonicalPath="/"
+      />
       <main className="flex-1 flex flex-col items-center justify-center py-8 px-4">
         {phase === 'setup' && (
           <header className="text-center max-w-2xl mb-6">

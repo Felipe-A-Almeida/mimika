@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 
 export default function Contact() {
   const [name, setName] = useState('');
@@ -22,6 +23,10 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Contato - Mimika | Jogo de Mímica Online"
+        description="Entre em contato com a equipe do Mimika. Envie dúvidas, sugestões ou relate problemas sobre o jogo de mímica online."
+      />
       <div className="max-w-xl w-full mx-auto flex-1 py-12 px-4">
         <h1 className="text-4xl font-bold mb-2 text-foreground">Contato</h1>
         <p className="text-muted-foreground mb-8">

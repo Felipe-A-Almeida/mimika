@@ -1,10 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 
 export default function PrivacyPolicy() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Política de Privacidade - Mimika"
+        description="Política de privacidade do Mimika, jogo de mímica online gratuito. Saiba como tratamos seus dados."
+      />
       <article className="max-w-3xl w-full mx-auto prose prose-invert flex-1 py-12 px-4">
         <h1 className="text-4xl font-bold mb-2 text-foreground">Política de Privacidade</h1>
         <p className="text-muted-foreground mb-8">Última atualização: {new Date().toLocaleDateString('pt-BR')}</p>

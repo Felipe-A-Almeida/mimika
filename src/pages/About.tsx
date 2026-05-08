@@ -1,10 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 
 export default function About() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Sobre o Mimika - Jogo de Mímica Online Grátis"
+        description="Conheça o Mimika: jogo de mímica online gratuito para jogar com amigos e família, com categorias geradas por inteligência artificial."
+      />
       <article className="max-w-3xl w-full mx-auto flex-1 py-12 px-4">
         <h1 className="text-4xl font-bold mb-2 text-foreground">Sobre o Mimika</h1>
         <p className="text-muted-foreground mb-8">

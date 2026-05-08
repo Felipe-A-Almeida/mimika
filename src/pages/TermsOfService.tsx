@@ -1,10 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 
 export default function TermsOfService() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO
+        title="Termos de Serviço - Mimika"
+        description="Termos de serviço do Mimika, jogo de mímica online gratuito. Conheça as regras de uso."
+      />
       <article className="max-w-3xl w-full mx-auto prose prose-invert flex-1 py-12 px-4">
         <h1 className="text-4xl font-bold mb-2 text-foreground">Termos de Serviço</h1>
         <p className="text-muted-foreground mb-8">Última atualização: {new Date().toLocaleDateString('pt-BR')}</p>
